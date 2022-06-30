@@ -6,12 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 public class _35_FileIO4_Homework {
 	
@@ -133,11 +129,6 @@ public class _35_FileIO4_Homework {
 			System.out.println(stringBuilder + "\n");
 		} catch (Exception e) {
 			
-		}
-		---------------------------System.out.println();
-		
-		for (String temp : diziler2) {
-			System.out.println(temp);
 		}
 		
 	}
