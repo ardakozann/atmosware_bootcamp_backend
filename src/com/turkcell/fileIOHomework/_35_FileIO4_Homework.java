@@ -39,7 +39,6 @@ public class _35_FileIO4_Homework {
 				} else {
 					System.out.println("Yetkiniz yok.");
 				}
-				
 				break;
 			case 3:
 				System.out.println("*** Dosya Oku ***");
@@ -66,7 +65,7 @@ public class _35_FileIO4_Homework {
 				allFiles();
 				break;
 			case 0:
-				System.out.println("Cikis yapiliyor.");
+				System.out.println("Cikis yapildi.");
 				System.exit(0);
 				break;
 			default:
@@ -74,6 +73,7 @@ public class _35_FileIO4_Homework {
 		}
 	}
 	
+	// rol seçme
 	private static int chooiseRole() {
 		int rol = 0;
 		while (rol < 1 || rol > 3) {
@@ -84,6 +84,7 @@ public class _35_FileIO4_Homework {
 		return rol;
 	}
 	
+	// Dosya hakkindaki bilgiler
 	private static void dataFileInformation() throws IOException {
 		
 		allFiles();
@@ -106,6 +107,7 @@ public class _35_FileIO4_Homework {
 		
 	}
 	
+	// Dosa silme
 	private static void deleteDataFile() {
 		allFiles();
 		File file = fileFunction();
@@ -117,6 +119,7 @@ public class _35_FileIO4_Homework {
 		}
 	}
 	
+	// Dosya içeriğini okuma
 	private static void readDataFile() throws IOException {
 		allFiles();
 		File file = fileFunction();
@@ -133,6 +136,7 @@ public class _35_FileIO4_Homework {
 		
 	}
 	
+	// Dosyaya yazı yazma
 	private static void writeDataFile() {
 		
 		allFiles();
@@ -156,6 +160,7 @@ public class _35_FileIO4_Homework {
 		}
 	}
 	
+	// Dosya yaratma
 	private static void createDataFile() throws IOException {
 		String path = dataMerge(null);
 		File file = new File(path);
@@ -166,8 +171,12 @@ public class _35_FileIO4_Homework {
 		}
 	}
 	
+	// path i birleştirme
+	// Burada eğer dosya oluşturmadan geliniyorsa fileName null geliyor ve fileName
+	// istiyor.
+	// Eğer dosya okuma silme gibi metotlardan geliyorsa fileName geliyor zaten
 	private static String dataMerge(String fileName) {
-		StringBuilder stringBuilder = new StringBuilder("C:\\\\turkcell\\\\");
+		StringBuilder stringBuilder = new StringBuilder("C:\\turkcell\\");
 		if (fileName == null) {
 			fileName = createDataPath();
 		}
@@ -175,11 +184,14 @@ public class _35_FileIO4_Homework {
 		return stringBuilder.toString();
 	}
 	
+	// Dosya ismini döndürüyor
 	private static String createDataPath() {
 		System.out.println("Dosya ismi giriniz:");
 		return scanner.next();
 	}
 	
+	// Dosya ismi girildikten sonra File nesnesine bunu atayıp file nesnesi
+	// döndürüyor
 	private static File fileFunction() {
 		
 		System.out.println("Dosya ismini giriniz.");
@@ -188,6 +200,7 @@ public class _35_FileIO4_Homework {
 		return new File(filePath);
 	}
 	
+	// tüm dosyaları gösteriyor
 	private static void allFiles() {
 		
 		System.out.println("\nDizin : C:\\turkcell");

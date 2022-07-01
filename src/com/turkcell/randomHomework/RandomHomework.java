@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 public class RandomHomework {
 	
@@ -24,16 +23,19 @@ public class RandomHomework {
 		writeToFile(afterMatch);
 	}
 	
+	// dosyadaki öğrencileri liste halinde almak
 	private static List<String> takeStudents() throws IOException {
 		File studentFile = fileFunction("Ogrencilerin");
 		return convertToList(studentFile);
 	}
 	
+	// Dosyadaki ödevleri liste halinde almak
 	private static List<String> takeHomeworks() throws IOException {
 		File homeworkFile = fileFunction("Odevlerin");
 		return convertToList(homeworkFile);
 	}
 	
+	// karıştırılan ödevleri ve öğrencileri eşleştirmek
 	private static List<String> randomMatch(String[] homeworks, List<String> students) {
 		ArrayList<String> afterMatch = new ArrayList<String>();
 		int min = Math.min(students.size(), homeworks.length);
@@ -43,6 +45,7 @@ public class RandomHomework {
 		return afterMatch;
 	}
 	
+	// Karıştırılan ödevleri ve öğrencileri yan yana yazdırmak
 	private static void writeToFile(List<String> afterMatched) throws IOException {
 		
 		File file = fileFunction("Odevlerin dagitilacak");
@@ -63,6 +66,7 @@ public class RandomHomework {
 		
 	}
 	
+	// File nesnesine path i atamak
 	private static File fileFunction(String name) {
 		
 		System.out.println(name + " oldugu dosya ismini giriniz:");
@@ -71,8 +75,9 @@ public class RandomHomework {
 		return new File("C:\\turkcell\\" + fileName + ".txt");
 	}
 	
+	// Ödevleri dizi içerisinde sırasını karıştırmak
 	private static String[] toShuffle(List<String> homeworks) {
-		
+		// List tipini shuffle için diziye atama
 		String[] homeworksArray = new String[homeworks.size()];
 		
 		for (int i = 0; i < homeworks.size(); i++) {
@@ -80,7 +85,7 @@ public class RandomHomework {
 		}
 		
 		Random random = new Random();
-		
+		// Dizide shuffle yapma
 		for (int i = homeworks.size() - 1; i > 0; i--) {
 			
 			int j = random.nextInt(i);
@@ -92,9 +97,9 @@ public class RandomHomework {
 		return homeworksArray;
 	}
 	
+	// Dosya içeriğindeki metinleri her bir satırı liste şeklinde geri döndürmek
 	private static List<String> convertToList(File file) throws IOException {
-		Stream<String> stream = Files.lines(Paths.get(file.getPath()));
-		return stream.toList();
+		return Files.lines(Paths.get(file.getPath())).toList();
 	}
 	
 	public static void main(String[] args) throws IOException {
