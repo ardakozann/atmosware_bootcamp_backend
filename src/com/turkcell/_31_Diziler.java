@@ -1,6 +1,7 @@
 package com.turkcell;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class _31_Diziler {
 	
@@ -12,7 +13,7 @@ public class _31_Diziler {
 		dizi[5] = 2;
 		
 		Arrays.sort(dizi);
-		
+		Collectors.toList();
 		// iterative for
 		for (int i = 0; i < dizi.length; i++) {
 			System.out.print(dizi[i] + " ");
