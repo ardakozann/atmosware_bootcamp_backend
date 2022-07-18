@@ -1,0 +1,165 @@
+-- comment out/in
+DB Management
+----------------------------------------------------
+1-Mysql
+2-Postgresql
+3-H2-Db
+4-Mssql
+5-MariaDb
+6-Sybase
+
+Client: istemci
+Server: isteği yerine getiren
+
+Data(veri): işlenmemiş bilgilere denir.
+
+VeriTabanı: Mantıksal ve fiziksel veri kümelerine denir.
+Veri Tabanı Yönetim Sistemi: verileri saklamak, güvenliğini sağlamak, tekrarsız veriler oluşturmak, yedeğini almak
+
+Veri Tabanı
+----------------------------------------------------
+Düzenli veriler topluluğudur.
+Gereksiz verileri barındırmaz.
+Bellek kullanımı düzenlidir.
+
+İyi bir Veritabanı nasıl olmalıdır ?
+----------------------------------------------------
+Güvenilir olmalıdır.
+Güvenli bir şekilde verilerimizi saklayabilmeliyiz.
+Tekrarsız veriler olması gerekir.
+
+Veri Tabanı Türleri
+----------------------------------------------------
+1-Hiyerarşik Veri tabanı
+2-İlişkisel Veri tabanları
+3-İlişkisel olmayan veri tabanları
+4-Nesnesel Veri tabanları
+
+İlişkisel Veri tabanları
+----------------------------------------------------
+satır(row) sütun(column)
+Verileri tablolarda tutulur.
+Normalization (Verileri daha düzgün muhafaza etmek)
+Sql Manipulation
+Dikey Ölçekleme ( ARAŞTIR )
+
+RDBMS - VTYS(Veri Tabanı Yönetim Sistemi) => Mysql, Postgresql, Mssql
+----------------------------------------------------
+Veriyi muhafaza etmek
+Veri bütünlüğünü korumak
+DDL
+DML
+
+VTYS(Veri Tabanı Yönetim Sistemi)
+----------------------------------------------------
+Veri tabanı kavramı 1980 yıllarda ortaya çıkıyor.
+Verileri saklamak, güncellemek, yönetmek, günveliği sağlamak
+Veriler bütünlüğünü korumak
+Veri tekrarında uzak durmak
+
+SQL:
+----------------------------------------------------
+Sql standartımız 1983 IBM laboratuvarlarında standartlarını belirliyorlar.
+1987 ANSI SQL standartlaştırmışlardır.
+SQL Oracle, Sybase, Mysql, Mssql
+Sorgulama dilidir. Programlama dili değildir.
+DBMS'ler bu SQL kullanarak üzerine yeni özellikler inşa eder.
+non-case-sensitive (Büyük küçük harfe duyarlı değildir.)
+Noktalı virgül şeklinde yazalım.
+Bütün VTYS'lerde kullanılır.
+SEQUEL(Structed English Query Language)
+SQL (Structed Query Language)
+T-SQL: sql bağdaştırılmış bir kelimedir.
+
+SQL ALT GRUPLARI
+----------------------------------------------------
+1-) DCL (Data Control Language) : Veri Kontrol Dili => Grant(Erişim izni), Revoke(Erişim iznini kaldır), Deny(Erişim engelleme)
+2-) DML (Data Manipulation Language) : Veri İşleme Dili => insert, update, delete, merge
+3-) DDL (Data Definition Language) : Veri Tanımlama => create, alter, drop, truncate, rename, comment
+4-) DQL (Data Query Language) : Veri Sorgulama => select
+
+SQL syntax 
+----------------------------------------------------
+Tek Tırnak: ''
+Çift Tırnak: ""
+backtick: ``
+
+-- DDL
+-- Database oluşturmak için (Türkçe karakterden dolayı default da yazılır.)
+-- database oluşturmak için alttaki 2 yapıdan birisi kullanılabilir.
+create DATABASE `deneme`;
+create schema default charactern set utf8 collate utf8_turkish_ci;
+default
+-- Database silmek için
+drop DATABASE deneme;
+-- Alter bir tabloya sütun eklemek, mevcut sütunları silmek veya değiştirerek tablonun yapısını değiştirmek için kullanılır.
+alter schema deneme default character set utf8 collate utf8_turkish_ci;
+
+----------------------------------------------------
+-- Table
+
+--Common rulesd
+-- ; (noktalı virgulu unutma)
+-- büyük harfle yazılır
+-- comment yazmayı unutma
+
+-- değişkenleri oluştururken:
+-- hepsi küçük harf ve kelimeler ayrıştırırken under_score kullanalım: student_name
+
+--  MYSQL
+CREATE TABLE person (
+`tc_kimlik_id` SMALLINT(5) NOT NULL AUTO_INCREMENT,
+`student_name` VARCHAR(150) NOT NULL,
+`student_surname` VARCHAR(255) NULL,
+`created_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`tc_kimlik_id`));
+
+-- Postgresql
+CREATE TABLE IF NOT EXISTS public.deneme
+(
+    id serial NOT NULL,
+    name character varying(155),
+    surname character varying(255),
+    PRIMARY KEY (id)
+    );
+ALTER TABLE public.deneme
+    OWNER to postgres;
+----------------------------------------------
+-- select
+select * from employees;
+-- sütun gösterme
+select last_name from employees;
+-- Koşul belirleme
+select last_name from employees where last_name='King';
+
+
+----------------------------------------------
+-- Operators
+=
+<> !=
+>
+<
+>=
+<=
+
+-- Relation
+AND: ve
+OR : veya
+
+----------------------------------------------
+-- id name surname
+-- deneme
+select * from deneme;
+-- insert
+insert into deneme(name, surname) values ('adı55','soyadı55');
+insert into deneme(name, surname) values ('adı77','soyadı77');
+
+-- delete
+-- Bu şekilde yapılırsa tüm tablo içeriği silinir.
+delete from deneme;
+delete from deneme where id=6;
+
+-- update
+-- Bu şekilde yapılırsa tüm name ler değişir.
+update deneme set name='adı 99';
+update deneme set name='adı 99' where id=8;
