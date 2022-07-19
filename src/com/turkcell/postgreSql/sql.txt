@@ -163,3 +163,187 @@ delete from deneme where id=6;
 -- Bu şekilde yapılırsa tüm name ler değişir.
 update deneme set name='adı 99';
 update deneme set name='adı 99' where id=8;
+
+-- aritmetik işlemler
+select 4+4;
+select 4-4;
+select 4/4;
+select 4*4;
+
+-- DDL (Tablo - veritabanı)          DML (row-column)          DQL               DCL
+-- create                            insert			           select            Grand
+-- drop			                     update										 Revoke
+-- truncate		                     delete										 Deny
+-- rename
+-- alter
+
+-- select kolonAdi from tabloAdi where ...
+-- where      : şart için
+-- distinct   : veri tekrarlarını önler
+-- order by   : Küçükten büyüğe veya büyükten küçüğe sıralar. 
+-- group by   : gruplar halinde verileri kümelemeye yarar.
+-- having     : group by ile beraber kullanılır. where koşulu yerine kullanılır.
+-- and        : ve
+-- or         : veya
+-- not        : değil
+-- in         : subQuery için kullanılır.
+-- between    : arasındaki verileri almak için kullanılır.
+-- like       : filtreleme, search işlemlerinde kullanılır.
+-- as (alias) : as takma adı
+
+-- aggregate  =>
+-- avg        : Sütunların ortalamasını verir
+-- min        : Sütunların minimumunu verir.
+-- max        : Sütunların maksimumunu verir.
+-- count      : Sütunların adetini verir.
+-- sum        : Sütunların toplamını verir.
+
+-- İç içe sorguyla biz join'in yaptığını yapabiliriz.
+
+-- inner join : tablolardaki ortak alan
+-- left join  : ortak alan ve sol taraf
+-- right join : ortak alan ve sağ taraf
+
+-- data types (1byte = 8bit)
+-- serial            : auto increment ve PK olmasını sağlar.
+-- character varying : String ifadeler için kullanılır.
+-- smallint          : 2 byte kadar veri tutar. < integer
+-- integer           : 4 byte kadar veri tutar. < bigint
+-- bigint            : 8 byte kadar veri tutar.
+-- text              : çok büyük veriler için kullanılır.
+
+-- date
+-- TIMESTAMP         : YIL-AY-GÜN-SAAT-DAKİKA-SANİYE
+-- DATE              : YIL-AY-GÜN
+-- YEAR              : YIL
+-- TIME              : SAAT-DAKİKA-SANİYE
+
+select CURRENT_DATE;
+select CURRENT_TIME;
+select CURRENT_TIMESTAMP;
+select LOCALTIME;
+select LOCALTIMESTAMP;
+select age ('2022-01-01','2021-01-01');
+
+---------------------------------------------------------------
+-- DDL
+
+-- DATABASE
+
+
+-- TABLE
+CREATE TABLE IF NOT EXISTS public.student
+(
+    id serial NOT NULL,
+    name character varying(155),
+    surname character varying,
+    "number" integer,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE public.student
+    OWNER to postgres;
+---------------------------------------------------------------
+-- DDL manuel
+-- TABLE
+create table if not exists person(
+	id serial not null, 
+	adi varchar(100) default 'personel adını yazmadınız',
+	surname character varying(250),
+	information TEXT,
+	number integer,
+	created_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+)
+
+create table if not exists school(
+	id serial not null, 
+	adi character varying(250),
+	person_id int references person(id) not null,
+	created_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+)
+
+-- Constraints (kısıtlayıcılar)
+
+-- PK
+-- FK
+-- Unique : benzersiz
+-- default : eğer bir şey girilmezse default olarak girilecek değer.
+-- Check :
+
+-- Table sil
+drop table person; -- Tabloyu komple siler
+truncate table person; -- İçini boşaltmak.
+truncate table person restart identity; -- İçini boşaltır ve id'i sıfırlar.
+
+-- TABLE'A Sütun ekleme
+
+----------------------------------------------------------------
+-- DQL
+select * from student;
+select * from person;
+select * from school;
+----------------------------------------------------------------
+-- DML
+
+-- insert
+insert into student (name, surname, number) values ('Hamit','Mızrak',44);
+insert into person (surname) values ('Mızrak');
+
+
+-- delete
+delete from student; -- Böyle yaparsak tüm tablo silinir
+delete from student where id=1; -- Böyle yapılırsa id si 1 olanı siler.
+-- DELETE 0 : Silinemedi.
+-- DELETE 1 : 1 tane data sildi.
+
+-- update
+update student set name='isim değişti'; -- Böyle yaparsa tüm tablo nameleri değişir.
+update student set name='isim değişti2' where id=2; -- Böyle yaparsa id'si 2 olan değişir.
+
+
+select first_name, last_name from employees;
+
+-- S3-) employees tablosundaki last_name ve first_name verileri getirelim(alias kullanalım => employees=emp olsun) ?
+
+select first_name as emp2, last_name as emp3 from employees as emp;
+
+-- S4-) employees tablosundaki adı Steven olan kişileri getir
+select * from employees where first_name='Steven';
+select * from employees as emp where emp.first_name='Steven';
+
+-- S5-) employees tablosundaki adı Steven olmayan kişileri getir
+select * from employees where not first_name='Steven';
+select * from employees where first_name!='Steven';
+
+-- S6-) employees tablosundaki first_name Steven olan tekrarı kaldıralım ve first_name getirelim
+select distinct first_name from employees;
+
+-- S7-) employees tablosundaki first_name küçükten büyüğe göre getirelim
+select * from employees order by first_name;
+select * from employees order by first_name desc;
+
+-- S8-) employees tablosundaki adı Steven olan ve London da oturan kişileri getir
+select * from employees where first_name='Steven' and city='London';
+select * from employees where first_name like 'Steven' and city like 'London';
+
+-- S9-) employees tablosundaki adı Steven olan veya London da oturan kişileri getir
+select * from employees where first_name like 'Steven' or city like 'London';
+
+-- S10-) employees tablosundaki first_name küçükten büyüğe doğru olacak şekilde ilk 5 tane veriyi getirelim
+select * from employees order by first_name limit 5;
+-- S11.1-) employees tablosundaki first_name i A ile başlayan bütün dataları getirelim
+select * from employees where first_name like 'A%';
+-- S11.2-) employees tablosundaki first_name i n ile biten bütün dataları getirelim
+select * from employees where first_name like '%n';
+-- S11.3-) employees tablosundaki first_name i 'an' geçen bütün dataları getirelim
+select * from employees where first_name like '%an%';
+-- S11.4-) employees tablosundaki first_name i ilk harfi 'S' son harfi 'n' ve 6 harfli olan bütün dataları getirelim
+select * from employees where first_name like 'S____n';
+-- S12-) employees tablosundaki extension sütununda 428 ile 465 arasındaki verileri bütün dataları getirelim
+select * from employees where extension between '428' and '465';
+-- S13-) employees tablosundaki first_name sütunundaki Steven, Michael, Anne ismindeki bütün dataları getirelim (in)
+select * from employees where first_name in ('Steven','Michael','Anne');
+-- IS NULL
+-- employees tablosundaki region sütunundaki
