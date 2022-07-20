@@ -339,6 +339,8 @@ select * from employees where first_name like 'A%';
 select * from employees where first_name like '%n';
 -- S11.3-) employees tablosundaki first_name i 'an' geçen bütün dataları getirelim
 select * from employees where first_name like '%an%';
+-- 11.3-) employees tablosundaki first_name sütunundaki 'n' ile başlasın ve 'y' harfi ile biten bütün dataları getirelim ?
+select * from employees as emp where emp.first_name like 'N%y';
 -- S11.4-) employees tablosundaki first_name i ilk harfi 'S' son harfi 'n' ve 6 harfli olan bütün dataları getirelim
 select * from employees where first_name like 'S____n';
 -- S12-) employees tablosundaki extension sütununda 428 ile 465 arasındaki verileri bütün dataları getirelim
@@ -347,3 +349,208 @@ select * from employees where extension between '428' and '465';
 select * from employees where first_name in ('Steven','Michael','Anne');
 -- IS NULL
 -- employees tablosundaki region sütunundaki
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- cast türler arasında değiştirme işlemlerinde kullanıyoruz.
+-- cast('428' as integer)
+-- S13-) employees tablosundaki extension sütununda '428' ile '465' öncelikle character varying olanı integer cast yapalım ve sonrasında
+-- arasındaki verileri bütün dataları getirelim ? (between cast)
+select * from employees where cast(extension as integer) between 428 and 465;
+select * from employees order by cast(extension as integer);
+-- S14-) employees tablosundaki region sütunundaki null olan değerleri listeyelim ?
+select * from employees where region is null;
+-- S14-) employees tablosundaki region sütunundaki null olmayan değerleri listeyelim ?
+select * from employees where region is not null;
+-- S15-) employees tablosundaki region sütununda null olan dataları 'değişti' olarak değiştir.
+update employees set region='değişti' where region is null;
+select * from employees where region like 'değişti';
+
+select cast('5' as integer);
+select cast('5' as INTEGER);
+select cast(5 as character varying);
+select cast(5 as char);
+select cast('2022-02-20 9:49:52' as Date);
+select cast('2022-02-20 9:49:52' as time);
+
+--in: subQuery ve sutundaki birden fazla aramak için kullanıyoruz.
+--in: aynı sutundaki birden fazla data getirmek için kullanıyoruz.
+--s13-) employees tablosundaki first_name sutunundaki Steven,Michael,Anne ismindeki bütün dataları getirelim ?  (in)
+select * from employees as emp where emp.first_name in('Steven','Michael','Anne');
+
+
+-----------------------------------------------------------------------------------------------
+--is null : boş olan datalar
+--s14-) employees tablosundaki region sutunundaki null olan değerleri listeleyelim?
+select * from employees as emp where emp.region is null;
+
+--is not null : boş olmayan datalar
+--s15-) employees tablosundaki region sutunundaki not null olan değerleri listeleyelim?
+select * from employees as emp where emp.region is not null;
+
+--s16-) employees tablosundaki region sutunundaki null olan dataları 'değişti' yazısını yazarak listeleyelim?(update,is null)
+update employees as emp  set region='değişti' where emp.region is null;
+
+
+-----------------------------------------------------------------------------------------------
+
+--MATH
+--Mutlak değer
+select abs(-44);
+
+--Karekök
+select sqrt(16);
+
+--üslü sayılar
+select pow(2,5);
+
+--üste yuvarla
+select ceil(4.1);
+
+--aşağı yuvarla
+select floor(4.9);
+
+--üst-aşağı yuvarla
+select round(4.5);
+select round(4.4);
+
+--random-rastgele
+select random()*2+1;
+select round(random()*2+1);
+-----------------------------------------------------------------------------------------------
+--aggreagate
+select emp.employee_id from employees as emp;
+
+--count: sayma
+select count(*) from employees as emp; 
+
+-- en küçük sayı
+select min(emp.employee_id) from employees as emp;
+
+-- en büyük sayı
+select max(emp.employee_id) from employees as emp;
+
+--toplamları
+select sum(emp.employee_id) from employees as emp;
+
+--ortalaması
+select avg(emp.employee_id) from employees as emp;
+
+
+-----------------------------------------------------------------------------------------------
+-- YAŞ HESAPLAMASI
+select age('2022-01-01','2021-01-01')
+
+--sleep
+--pg_sleep(5) 5 saniye bekletiyor.
+select pg_sleep(5);
+select emp.region from employees as emp;
+
+-----------------------------------------------------------------------------------------------
+
+-- S17-) employees tablosundaki birth_date sütnununda kaç tane null vardır ?
+
+-- S17-) employees tablosundaki birth_date sütununda kaç tane null olmayan vardır ?
+
+-- S18-) employees tablosundaki employee_id en küçüğü alt taban, en büyüğü üst taban olacak şekilde üslü sayı sorgusu ?
+
+select pow(max(employee_id), min(employee_id)) from employees;
+
+-----------------------------------------------------------------------------------------------
+-- coalescence içerisindeki ilk null olmayan değeri döndürür
+update employees set region=null where region like 'değişti';
+select coalesce(region,'not provided') from employees;
+
+-- NULLIF: verilerin iki parametre de null olmayanı döndürür
+select IFNULL(null,null);
+select IFNULL(1,null);
+select IFNULL(null,1);
+-----------------------------------------------------------------------------------------------
+-- STRING
+select last_name from employees;
+
+-- lowerCase
+select lower(last_name) from employees;
+
+-- upperCase
+select upper(last_name) from employees;
+
+-- subString
+select substring(last_name,1,3) from employees;-- 1 başlangıç indexi, 3 indexten sonra kaç harf
+
+-- replace
+select replace(last_name,'a','ARABA') from employees;
+
+--sol bosluk al
+select ltrim(last_name) from employees;
+
+--sag bosluk al
+select rtrim(last_name) from employees;
+
+--length: harf sayısını verir
+select length(last_name) from employees;
+
+--repeat: tekrar sayısını verir
+select repeat(last_name,3) from employees;
+
+--concat: sonuna eklemeye yarar
+select repeat(concat(last_name,' '), 3) from employees;
+
+select * from employees;
+-----------------------------------------------------------------------------------------------
+--Soru
+-- northwind databaseine student diye bir tablo oluşturalım
+-- attributes: student_id,student_name(150) UNIQUE,student_surname(250),vizeNotes,finalNotes,current_time
+create table if not exists student (
+	student_id serial PRIMARY KEY,
+	student_name character varying(150) UNIQUE,
+	student_surname character varying(250),
+	vize_note integer,
+	final_note integer,
+	created_date date default current_date
+);
+-- 1-) 6 tane insert into
+insert into student (student_name, student_surname, vize_note, final_note) values ('Dianne', 'Checchi', 7, 8);
+insert into student (student_name, student_surname, vize_note, final_note) values ('Lennie', 'Ghiotto', 81, 30);
+insert into student (student_name, student_surname, vize_note, final_note) values ('Gay', 'Hardinge', 65, 90);
+insert into student (student_name, student_surname, vize_note, final_note) values ('Enid', 'Glabach', 24, 20);
+insert into student (student_name, student_surname, vize_note, final_note) values ('Quintin', 'Willment', 13, 32);
+insert into student (student_name, student_surname, vize_note, final_note) values ('Cody', 'Dewey', 83, 74);
+-- 2-) son kayıtta güncelleme yapalım student_name='silinecek' where id=max
+update student set student_name='silinecek' where student_id= (SELECT MAX(student_id) from student);
+-- 3-) son veriyi silelim (max)
+delete from student where student_id = (SELECT MAX(student_id) from student);
+-- 4-) student tablosunun verilerini listeleyelim. 
+select * from student;
+-- 6-) student vize notları listeleyelim.
+select vize_note from student;
+-- 7-) student final notları listeleyelim.
+select final_note from student;
+-- 8-) student tablosundaki student_name columnsin sonu 2 ile biten listeleyim.
+select * from student where student_name like '%2';
+-- 9-) student tablosundaki vize_notunun %40  + final notunun %60 hesaplayan ve sonuc diye bir kolun oluşturalım.
+select concat(student_name,' ',student_surname) as  full_name, ((vize_note*0.4) + (final_note*0.6)) as total_note from student; 
+--  aggregation
+-- 10-) çıkan sonuclarından en büyüğünü alias:enbuyuk bulalım.
+select MAX((vize_note*0.4) + (final_note*0.6)) as total_note from student; 
+select concat(student_name,' ',student_surname) as  full_name, ((vize_note*0.4) + (final_note*0.6)) as total_note from student order by total_note desc limit 1; 
+-- 11-) çıkan sonuclarından en küçüğü alias:enKucuk bulalım.
+select MIN((vize_note*0.4) + (final_note*0.6)) as total_note from student; 
+select concat(student_name,' ',student_surname) as  full_name, ((vize_note*0.4) + (final_note*0.6)) as total_note from student order by total_note limit 1; 
+-- 12-) çıkan sonuclarından toplamları alias:toplam bulalım.
+select SUM((vize_note*0.4) + (final_note*0.6)) as sum_of_notes from student;
+-- 13-) çıkan sonuclarından ortalaması alias:ortalama bulalım.
+select AVG((vize_note*0.4) + (final_note*0.6)) as avg_of_notes from student;
+-- 14-) çıkan sonuclarından toplam kaç adet vardır alias:sayi bulalım.
+select COUNT((vize_note*0.4) + (final_note*0.6)) as count_of_notes from student;
+
+--union
+--join
+--group by
+--having
+--transaction
+--Trigger 
+--indexes
+--view
+--function
+--sp
