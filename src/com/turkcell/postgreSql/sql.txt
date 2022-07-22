@@ -438,6 +438,10 @@ select avg(emp.employee_id) from employees as emp;
 
 
 -----------------------------------------------------------------------------------------------
+-- version
+select version();
+select username from pg_user;
+-- databasedeki kullanıcıları listeler
 -- YAŞ HESAPLAMASI
 select age('2022-01-01','2021-01-01')
 
@@ -445,6 +449,13 @@ select age('2022-01-01','2021-01-01')
 --pg_sleep(5) 5 saniye bekletiyor.
 select pg_sleep(5);
 select emp.region from employees as emp;
+
+ --ascii
+ select ASCII ('1');
+ 
+  -- sign: negatif pozitif mi ?  pozitif:+1 negatif:-1
+ select  sign(44); --pozitif :+
+ select  sign(-44);--negatif:-1
 
 -----------------------------------------------------------------------------------------------
 
@@ -554,3 +565,285 @@ select COUNT((vize_note*0.4) + (final_note*0.6)) as count_of_notes from student;
 --view
 --function
 --sp
+
+ERD DİYAGRAMINA BAK ARAŞTIR
+
+--------------------------------------------------------------
+-- subQuery    :
+-- index       : tablolarda bazen milyonlarca data olabilir. Örneğin student tablosundaki student_name sorgusunu çok atıyorsan
+--               Bu sorgu her defasında database'i yoracaktır. Biz de sürekli attığımız sorguları index ile oluşturup datayı cache
+--               belleğine alıp performans artırımı sağlanır.Sürekli yapılan sorgularda kullaınılır.
+-- view        : Database de uzun uzun sürekli sorgularımız varsa bize yardımcı olacak bileşen view'dir.
+-- union       :
+-- join        :
+-- function    :
+-- group by    :
+-- having      :
+-- transaction : ya hep ya hiç kuralına göre çalışır. Bizim bir datamızın bütün işlemleri bittikten sonra işlemler yapılmasını isteriz.
+--               
+-- trigger     :
+
+--------------------------------------------------------------
+-- subQuery
+-- İç içe sorgulamak demektir. Aslında javada öğrendiğimiz monad yapısıdır.
+-- yani bir query çıktı başka bir örneğin girdisidir.
+select * from employees;
+-- employee id si yüksek olana güncelleme yapsın
+
+-- CREATE TABLE
+create table if not exists student(
+	student_id serial PRIMARY KEY NOT NULL,
+	student_name character varying(150),
+	student_surname character varying,
+	vize_notes integer,
+	final_notes integer,
+	created_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
+
+-- drop
+drop table student;
+
+-- select
+select * from student;
+
+-- id si en yüksek olanı dinamik şekilde bulsun student_name='silinecek' yazsın
+update student set student_name='silinecek' where student_id=(select MAX(student_id) from student);
+-- birden fazla aynı tipte parametre verilirken in kullanılır
+update student set student_name='silinecek' in (student_id=(select MAX(student_id) from student));
+-- final notu yüksek olan sorguda final notunu ve vize notunu 10 puan düşürelim
+update student set vize_note=vize_note - 10, final_note=final_note - 10 where final_note=(select MAX(final_note) from student);
+
+--------------------------------------------------------------
+--CREATE INDEX
+-- create index indexAdi ON tabloAdi(tabloAttribute)
+create index student_index_name on student(student_name);
+select s2.student_name from student as s2;
+--------------------------------------------------------------
+-- view
+create view surekli_sorgulattigim_sorgu
+AS
+select student_name from student where student_name like 'Q%n';
+
+-- view çağırması
+select * from surekli_sorgulattigim_sorgu;
+--view silmek 
+drop view surekli_sorgulattigim_sorgu;
+
+--------------------------------------------------------------
+-- transaction
+
+select * from region;
+insert into region(region_id, region_description) values (5,'yeni data5');
+insert into region(region_id, region_description) values (6,'yeni data6');
+insert into region(region_id, region_description) values (7,'yeni data7');
+
+-- 3 tane veri olsun. Ben bunlardan sadece 2 tanesini sileceğim.
+BEGIN;
+	delete from region where region.region_id=5;
+	delete from region where region.region_id=6;
+SAVEPOINT birinci;
+	delete from region where region.region_id=7;
+ROLLBACK TO birinci;
+COMMIT;
+
+select * from region;
+delete from region where region.region_id=5;
+
+--------------------------------------------------------------
+--Function
+--Temp
+create function fonksiyonAdi()
+returns donusVeriTuru
+language plpgsql
+as
+$$
+	declare -- değişkneler
+	begin -- işlemler
+		return
+	end;
+$$;
+
+create function topla()
+returns integer -- geri dönüş değeri
+language plpgsql -- dili
+as
+$$
+	declare -- değişken oluşturmak
+		sonuc integer;
+		sayi1 integer=10;
+		sayi2 integer=20;
+	begin
+		sonuc=sayi1+sayi2;
+		return sonuc;
+	end;
+$$;
+
+-- Function çağırma
+select topla() as toplam;
+
+-- delete function
+drop function if exists topla;
+
+-- girilen bir kelimenin ilk 3 harfini gösteren function yazınız ?
+
+create function metinSub(kelime varchar(253))
+returns varchar
+language plpgsql
+as
+$$
+declare
+	temp_data varchar(253);
+begin
+	temp_data=substring(kelime,1,3);
+	return upper(temp_data);
+end;
+$$;
+
+select metinSub('İstanbul');
+
+--Drop
+drop function if exists metinSub;
+
+-- Girilen bir kelimeti bütün harfleri büyük yapan fonksiyon ?
+create function to_upper (temp varchar(255))
+returns varchar(255)
+language plpgsql
+as
+$$
+    begin
+        return UPPER(temp);
+    end;
+$$
+
+select to_upper('deneme');
+-- Girilen bir kelimeti bütün harfleri küçük yapan fonksiyon ?
+create function to_lower (temp varchar(255))
+returns varchar(255)
+language plpgsql
+as
+$$
+    begin
+        return LOWEr(temp);
+    end;
+$$
+
+select to_lower('DENEME');
+-- Türkçe karak olan üğşçöı => replace => ugscoi
+create or replace function turkishToEnglish(valueData varchar(255))
+returns varchar(255)
+language plpgsql
+as
+$$
+	begin
+		return translate(valueData,'uğşçöı','ugscoi');
+	end;
+$$;
+
+select turkishToEnglish('çorum');
+-- dereceyi fahrenheit'e çeviren fonksiyon ? F=C*1.8+32
+create function fahrenheit(celcius float)
+returns FLOAT
+language plpgsql
+as
+$$
+declare
+    result float;
+begin
+    result = (celcius*1.8) + 32;
+    return result;
+end;
+$$;
+
+select fahrenheit(10);
+-- girilen 3 sayıyı ortalaması alınan fonksiyon ?
+create function ortalama(sayi1 int, sayi2 int, sayi3 int)
+returns FLOAT
+language plpgsql
+as
+$$
+begin
+    return (sayi1+sayi2+sayi3)/3;
+end;
+$$;
+
+select ortalama(10,20,30);
+-- verilen yarıçapla dairenin alanını hesaplayan fonskiyon ? p*r^2
+create function alan_hesapla(r float)
+returns float
+language plpgsql
+as
+$$
+begin
+    return pi()*POWER(r,2);
+end;
+$$;
+
+select alan_hesapla(5);
+
+--------------------------------------------------------------
+-- yan yana tabloları birleştirmek
+select * from orders,region;
+
+-- union: birden fazla tabloyu tek bir tabloda göstermeye denir
+-- union şartları: attribute sayısı ve türleri aynı olacak
+create table if not exists union1(
+	union_id serial not null,
+	adi character varying,
+	soyadi character varying,
+	PRIMARY KEY(union_id)
+)
+-- Insert
+insert into union1(adi,soyadi) values('1','X');
+insert into union1(adi,soyadi) values('1','Y');
+insert into union1(adi,soyadi) values('1','X');
+
+create table if not exists union2(
+	union_id serial not null,
+	adi character varying,
+	soyadi character varying,
+	PRIMARY KEY(union_id)
+)
+
+insert into union2(adi,soyadi) values('1','X');
+insert into union2(adi,soyadi) values('1','Y');
+insert into union2(adi,soyadi) values('1','X');
+
+select * from union1,union2;
+-- UNION ( TEKRAR EDEN VERİLERİ GÖSTERMEZ)
+select * from union1
+union
+select * from union2
+
+--------------------------------------------------------------
+-- Join: 
+-- Yazar(1) kitaplar (N)
+-- Banka(1) - Müşteriler(N)
+
+-- YAZAR(1)
+create table if not exists yazar(
+	yazar_id serial not null,
+	yazar_adi character varying,
+	yazar_soyadi character varying,
+	created_date timestamp with time zone default current_timestamp,
+	primary key(yazar_id)
+)
+
+-- KITAPLAR (N)
+create table if not exists kitap(
+	kitap_id serial not null,
+	kitap_adi character varying,
+	kitap_fiyat integer,
+	created_date timestamp with time zone default current_timestamp,
+	yazar_id int not null REFERENCES yazar(yazar_id),
+	primary key(kitap_id)
+)
+
+insert into yazar(yazar_adi, yazar_soyadi) values ('Reşat Nuri','Gültekin');
+insert into kitap(kitap_adi, kitap_fiyat, yazar_id) values ('Çalışkuşu',85,1);
+insert into kitap(kitap_adi, kitap_fiyat, yazar_id) values ('Yaprak Dökümü',100,1);
+
+
+select * from kitap;
+select * from yazar;
+
+select * from yazar as y1 inner join kitap as k1 on y1.yazar_id=k1.yazar_id;
